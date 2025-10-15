@@ -9,8 +9,7 @@ import io.kotest.core.test.EnabledOrReasonIf
 import io.kotest.core.test.TestCase
 import io.kotest.core.test.TestCaseSeverityLevel
 import io.kotest.core.test.TestScope
-import io.kotest.datatest.WithDataRootRegistrar
-import io.kotest.datatest.WithDataTerminalRegistrar
+import io.kotest.datatest.WithDataRegistrar
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 
@@ -24,7 +23,7 @@ import kotlin.time.Duration
  * }
  * ```
  */
-interface StringSpecRootScope : RootScope, WithDataRootRegistrar<StringSpecScope> {
+interface StringSpecRootScope : RootScope, WithDataRegistrar {
 
    fun String.config(
       enabled: Boolean? = null,
@@ -76,11 +75,21 @@ interface StringSpecRootScope : RootScope, WithDataRootRegistrar<StringSpecScope
 
    override fun registerWithDataTest(
       name: String,
-      test: suspend StringSpecScope.() -> Unit
+      test: suspend TestScope.() -> Unit
    ) {
       name.invoke { test() }
    }
+
+   @Deprecated(
+      WithDataRegistrar.NO_SUSPEND_WITH_DATA,
+      level = DeprecationLevel.ERROR
+   )
+   override suspend fun registerSuspendWithDataTest(
+      name: String,
+      test: suspend TestScope.() -> Unit
+   ): Nothing = error(WithDataRegistrar.NO_SUSPEND_WITH_DATA)
 }
+
 
 /**
  * This scope exists purely to stop nested string scopes.
@@ -89,4 +98,23 @@ interface StringSpecRootScope : RootScope, WithDataRootRegistrar<StringSpecScope
 class StringSpecScope(
    override val coroutineContext: CoroutineContext,
    override val testCase: TestCase,
-) : TerminalScope(), WithDataTerminalRegistrar<StringSpecScope>
+) : TerminalScope(), WithDataRegistrar {
+
+   @Deprecated(
+      WithDataRegistrar.NO_NESTED_WITH_DATA,
+      level = DeprecationLevel.ERROR
+   )
+   override fun registerWithDataTest(
+      name: String,
+      test: suspend TestScope.() -> Unit
+   ): Nothing = error(WithDataRegistrar.NO_NESTED_WITH_DATA)
+
+   @Deprecated(
+      WithDataRegistrar.NO_NESTED_WITH_DATA,
+      level = DeprecationLevel.ERROR
+   )
+   override suspend fun registerSuspendWithDataTest(
+      name: String,
+      test: suspend TestScope.() -> Unit
+   ): Nothing = error(WithDataRegistrar.NO_NESTED_WITH_DATA)
+}

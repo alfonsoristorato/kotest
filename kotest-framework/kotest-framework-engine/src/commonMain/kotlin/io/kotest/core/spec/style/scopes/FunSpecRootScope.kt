@@ -3,12 +3,12 @@ package io.kotest.core.spec.style.scopes
 import io.kotest.core.names.TestNameBuilder
 import io.kotest.core.spec.RootTest
 import io.kotest.core.test.TestScope
-import io.kotest.datatest.WithDataRootRegistrar
+import io.kotest.datatest.WithDataRegistrar
 
 /**
  * Extends [RootScope] with dsl-methods for the 'fun spec' style.
  */
-interface FunSpecRootScope : RootScope, WithDataRootRegistrar<FunSpecContainerScope> {
+interface FunSpecRootScope : RootScope, WithDataRegistrar {
 
    /**
     * Adds a container [RootTest] that uses a [FunSpecContainerScope] as the test context.
@@ -73,8 +73,17 @@ interface FunSpecRootScope : RootScope, WithDataRootRegistrar<FunSpecContainerSc
 
    override fun registerWithDataTest(
       name: String,
-      test: suspend FunSpecContainerScope.() -> Unit
+      test: suspend TestScope.() -> Unit
    ) {
       context(name) { test() }
    }
+
+   @Deprecated(
+      WithDataRegistrar.NO_SUSPEND_WITH_DATA,
+      level = DeprecationLevel.ERROR
+   )
+   override suspend fun registerSuspendWithDataTest(
+      name: String,
+      test: suspend TestScope.() -> Unit
+   ): Nothing = error(WithDataRegistrar.NO_SUSPEND_WITH_DATA)
 }

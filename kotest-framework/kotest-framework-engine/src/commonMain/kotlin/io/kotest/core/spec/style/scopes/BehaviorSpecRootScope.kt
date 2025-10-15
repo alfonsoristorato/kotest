@@ -1,7 +1,8 @@
 package io.kotest.core.spec.style.scopes
 
 import io.kotest.core.names.TestNameBuilder
-import io.kotest.datatest.WithDataRootRegistrar
+import io.kotest.core.test.TestScope
+import io.kotest.datatest.WithDataRegistrar
 
 /**
  * A context that allows tests to be registered using the syntax:
@@ -11,7 +12,7 @@ import io.kotest.datatest.WithDataRootRegistrar
  * xgiven("some disabled test")
  * ```
  */
-interface BehaviorSpecRootScope : RootScope, WithDataRootRegistrar<BehaviorSpecContextContainerScope> {
+interface BehaviorSpecRootScope : RootScope, WithDataRegistrar {
 
    /**
     * Adds a top level [BehaviorSpecGivenContainerScope] to this spec.
@@ -77,8 +78,17 @@ interface BehaviorSpecRootScope : RootScope, WithDataRootRegistrar<BehaviorSpecC
 
    override fun registerWithDataTest(
       name: String,
-      test: suspend BehaviorSpecContextContainerScope.() -> Unit
+      test: suspend TestScope.() -> Unit
    ) {
       context(name) { test() }
    }
+
+   @Deprecated(
+      WithDataRegistrar.NO_SUSPEND_WITH_DATA,
+      level = DeprecationLevel.ERROR
+   )
+   override suspend fun registerSuspendWithDataTest(
+      name: String,
+      test: suspend TestScope.() -> Unit
+   ): Nothing = error(WithDataRegistrar.NO_SUSPEND_WITH_DATA)
 }

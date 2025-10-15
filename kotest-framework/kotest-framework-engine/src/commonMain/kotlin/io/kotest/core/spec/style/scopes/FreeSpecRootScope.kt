@@ -7,12 +7,12 @@ import io.kotest.core.test.EnabledIf
 import io.kotest.core.test.TestCaseSeverityLevel
 import io.kotest.core.test.TestScope
 import io.kotest.core.test.config.TestConfig
-import io.kotest.datatest.WithDataRootRegistrar
+import io.kotest.datatest.WithDataRegistrar
 import kotlin.time.Duration
 
 data class FreeSpecContextConfigBuilder(val name: String, val config: TestConfig)
 
-interface FreeSpecRootScope : RootScope, WithDataRootRegistrar<FreeSpecContainerScope> {
+interface FreeSpecRootScope : RootScope, WithDataRegistrar {
 
    // eg, "this test" - { } // adds a container test
    infix operator fun String.minus(test: suspend FreeSpecContainerScope.() -> Unit) {
@@ -134,8 +134,17 @@ interface FreeSpecRootScope : RootScope, WithDataRootRegistrar<FreeSpecContainer
 
    override fun registerWithDataTest(
       name: String,
-      test: suspend FreeSpecContainerScope.() -> Unit
+      test: suspend TestScope.() -> Unit
    ) {
       name.minus { test() }
    }
+
+   @Deprecated(
+      WithDataRegistrar.NO_SUSPEND_WITH_DATA,
+      level = DeprecationLevel.ERROR
+   )
+   override suspend fun registerSuspendWithDataTest(
+      name: String,
+      test: suspend TestScope.() -> Unit
+   ): Nothing = error(WithDataRegistrar.NO_SUSPEND_WITH_DATA)
 }

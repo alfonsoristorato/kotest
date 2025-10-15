@@ -2,12 +2,12 @@ package io.kotest.core.spec.style.scopes
 
 import io.kotest.core.names.TestNameBuilder
 import io.kotest.core.test.TestScope
-import io.kotest.datatest.WithDataRootRegistrar
+import io.kotest.datatest.WithDataRegistrar
 
 /**
  * Top level registration methods for ExpectSpec methods.
  */
-interface ExpectSpecRootScope : RootScope, WithDataRootRegistrar<ExpectSpecContainerScope> {
+interface ExpectSpecRootScope : RootScope, WithDataRegistrar {
 
    fun context(name: String, test: suspend ExpectSpecContainerScope.() -> Unit) {
       addContext(name = name, test = test, disabled = false)
@@ -79,8 +79,17 @@ interface ExpectSpecRootScope : RootScope, WithDataRootRegistrar<ExpectSpecConta
 
    override fun registerWithDataTest(
       name: String,
-      test: suspend ExpectSpecContainerScope.() -> Unit
+      test: suspend TestScope.() -> Unit
    ) {
       context(name) { test() }
    }
+
+   @Deprecated(
+      WithDataRegistrar.NO_SUSPEND_WITH_DATA,
+      level = DeprecationLevel.ERROR
+   )
+   override suspend fun registerSuspendWithDataTest(
+      name: String,
+      test: suspend TestScope.() -> Unit
+   ): Nothing = error(WithDataRegistrar.NO_SUSPEND_WITH_DATA)
 }

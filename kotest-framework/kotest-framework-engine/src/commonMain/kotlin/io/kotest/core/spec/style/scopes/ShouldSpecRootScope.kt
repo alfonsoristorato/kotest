@@ -2,7 +2,7 @@ package io.kotest.core.spec.style.scopes
 
 import io.kotest.core.names.TestNameBuilder
 import io.kotest.core.test.TestScope
-import io.kotest.datatest.WithDataRootRegistrar
+import io.kotest.datatest.WithDataRegistrar
 
 /**
  * Allows tests to be registered in the 'ShouldSpec' fashion.
@@ -23,7 +23,7 @@ import io.kotest.datatest.WithDataRootRegistrar
  * }
  * ```
  */
-interface ShouldSpecRootScope : RootScope, WithDataRootRegistrar<ShouldSpecContainerScope> {
+interface ShouldSpecRootScope : RootScope, WithDataRegistrar {
 
    /**
     * Adds a top level context scope to the spec.
@@ -105,8 +105,17 @@ interface ShouldSpecRootScope : RootScope, WithDataRootRegistrar<ShouldSpecConta
 
    override fun registerWithDataTest(
       name: String,
-      test: suspend ShouldSpecContainerScope.() -> Unit
+      test: suspend TestScope.() -> Unit
    ) {
       context(name) { test() }
    }
+
+   @Deprecated(
+      WithDataRegistrar.NO_SUSPEND_WITH_DATA,
+      level = DeprecationLevel.ERROR
+   )
+   override suspend fun registerSuspendWithDataTest(
+      name: String,
+      test: suspend TestScope.() -> Unit
+   ): Nothing = error(WithDataRegistrar.NO_SUSPEND_WITH_DATA)
 }

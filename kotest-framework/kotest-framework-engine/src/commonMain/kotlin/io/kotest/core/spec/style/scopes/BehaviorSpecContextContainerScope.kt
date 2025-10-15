@@ -3,13 +3,13 @@ package io.kotest.core.spec.style.scopes
 import io.kotest.core.names.TestNameBuilder
 import io.kotest.core.spec.KotestTestScope
 import io.kotest.core.test.TestScope
-import io.kotest.datatest.WithDataContainerRegistrar
+import io.kotest.datatest.WithDataRegistrar
 
 @Suppress("FunctionName")
 @KotestTestScope
 class BehaviorSpecContextContainerScope(
    val testScope: TestScope,
-) : AbstractContainerScope(testScope), WithDataContainerRegistrar<BehaviorSpecContextContainerScope> {
+) : AbstractContainerScope(testScope), WithDataRegistrar {
 
    suspend fun Given(name: String, test: suspend BehaviorSpecGivenContainerScope.() -> Unit) =
       given(name, xdisabled = false, test)
@@ -51,9 +51,18 @@ class BehaviorSpecContextContainerScope(
       }
    }
 
-   override suspend fun registerWithDataTest(
+   @Deprecated(
+      WithDataRegistrar.NO_BLOCKING_WITH_DATA,
+      level = DeprecationLevel.ERROR
+   )
+   override fun registerWithDataTest(
       name: String,
-      test: suspend BehaviorSpecContextContainerScope.() -> Unit
+      test: suspend TestScope.() -> Unit
+   ): Nothing = error(WithDataRegistrar.NO_BLOCKING_WITH_DATA)
+
+   override suspend fun registerSuspendWithDataTest(
+      name: String,
+      test: suspend TestScope.() -> Unit
    ) {
       context(name, false) { test() }
    }
