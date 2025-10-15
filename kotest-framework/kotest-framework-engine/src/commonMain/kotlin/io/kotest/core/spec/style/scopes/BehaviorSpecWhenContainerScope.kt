@@ -3,7 +3,7 @@ package io.kotest.core.spec.style.scopes
 import io.kotest.core.names.TestNameBuilder
 import io.kotest.core.spec.KotestTestScope
 import io.kotest.core.test.TestScope
-import io.kotest.datatest.WithDataContainerRegistrar
+import io.kotest.datatest.WithDataRegistrar
 
 /**
  * A context that allows tests to be registered using the syntax:
@@ -23,7 +23,7 @@ import io.kotest.datatest.WithDataContainerRegistrar
 @Suppress("FunctionName")
 @KotestTestScope
 class BehaviorSpecWhenContainerScope(val testScope: TestScope) :
-   AbstractContainerScope(testScope),WithDataContainerRegistrar<BehaviorSpecWhenContainerScope> {
+   AbstractContainerScope(testScope) {
 
    suspend fun And(name: String, test: suspend BehaviorSpecWhenContainerScope.() -> Unit) =
       and(name, xdisabled = false, test)
@@ -96,9 +96,18 @@ class BehaviorSpecWhenContainerScope(val testScope: TestScope) :
       )
    }
 
-   override suspend fun registerWithDataTest(
+   @Deprecated(
+      WithDataRegistrar.NO_BLOCKING_WITH_DATA,
+      level = DeprecationLevel.ERROR
+   )
+   override fun registerWithDataTest(
       name: String,
-      test: suspend BehaviorSpecWhenContainerScope.() -> Unit
+      test: suspend TestScope.() -> Unit
+   ): Nothing = error(WithDataRegistrar.NO_BLOCKING_WITH_DATA)
+
+   override suspend fun registerSuspendWithDataTest(
+      name: String,
+      test: suspend TestScope.() -> Unit
    ) {
       and(name) { test() }
    }

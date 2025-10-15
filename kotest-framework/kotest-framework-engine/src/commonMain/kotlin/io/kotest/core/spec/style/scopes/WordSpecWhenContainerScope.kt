@@ -3,13 +3,13 @@ package io.kotest.core.spec.style.scopes
 import io.kotest.core.names.TestNameBuilder
 import io.kotest.core.spec.KotestTestScope
 import io.kotest.core.test.TestScope
-import io.kotest.datatest.WithDataContainerRegistrar
+import io.kotest.datatest.WithDataRegistrar
 
 @Suppress("FunctionName")
 @KotestTestScope
 class WordSpecWhenContainerScope(
    val testScope: TestScope,
-) : AbstractContainerScope(testScope), WithDataContainerRegistrar<WordSpecWhenContainerScope> {
+) : AbstractContainerScope(testScope) {
 
    @Suppress("FunctionName")
    suspend infix fun String.When(init: suspend WordSpecWhenContainerScope.() -> Unit) = `when`(this, false, init)
@@ -50,11 +50,20 @@ class WordSpecWhenContainerScope(
       ) { WordSpecShouldContainerScope(this).test() }
    }
 
-   override suspend fun registerWithDataTest(
+   @Deprecated(
+      WithDataRegistrar.NO_BLOCKING_WITH_DATA,
+      level = DeprecationLevel.ERROR
+   )
+   override fun registerWithDataTest(
       name: String,
-      test: suspend WordSpecWhenContainerScope.() -> Unit
+      test: suspend TestScope.() -> Unit
+   ): Nothing = error(WithDataRegistrar.NO_BLOCKING_WITH_DATA)
+
+   override suspend fun registerSuspendWithDataTest(
+      name: String,
+      test: suspend TestScope.() -> Unit
    ) {
-      name `when` { test()}
+      name `when` { test() }
    }
 }
 

@@ -6,6 +6,7 @@ import io.kotest.core.spec.RootTest
 import io.kotest.core.test.TestScope
 import io.kotest.core.test.TestType
 import io.kotest.core.test.config.TestConfig
+import io.kotest.datatest.WithDataRegistrar
 
 /**
  * A [RootScope] allows for [RootTest]s to be registered via a DSL.

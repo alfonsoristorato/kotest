@@ -1,9 +1,10 @@
 package io.kotest.core.spec.style.scopes
 
 import io.kotest.core.names.TestNameBuilder
-import io.kotest.datatest.WithDataRootRegistrar
+import io.kotest.core.test.TestScope
+import io.kotest.datatest.WithDataRegistrar
 
-interface WordSpecRootScope : RootScope, WithDataRootRegistrar<WordSpecWhenContainerScope> {
+interface WordSpecRootScope : RootScope {
 
    infix fun String.should(test: suspend WordSpecShouldContainerScope.() -> Unit) {
       should(name = this, xdisabled = false, test = test)
@@ -34,12 +35,5 @@ interface WordSpecRootScope : RootScope, WithDataRootRegistrar<WordSpecWhenConta
          disabled = xdisabled,
          config = null,
       ) { WordSpecWhenContainerScope(this).test() }
-   }
-
-   override fun registerWithDataTest(
-      name: String,
-      test: suspend WordSpecWhenContainerScope.() -> Unit
-   ) {
-      name `when` { test() }
    }
 }

@@ -7,7 +7,7 @@ import io.kotest.core.spec.KotestTestScope
 import io.kotest.core.test.EnabledIf
 import io.kotest.core.test.TestCaseSeverityLevel
 import io.kotest.core.test.TestScope
-import io.kotest.datatest.WithDataTerminalRegistrar
+import io.kotest.datatest.WithDataRegistrar
 import kotlin.time.Duration
 
 /**
@@ -27,7 +27,7 @@ import kotlin.time.Duration
 @KotestTestScope
 class WordSpecShouldContainerScope(
    val testScope: TestScope,
-) : AbstractContainerScope(testScope), WithDataTerminalRegistrar<WordSpecTerminalScope> {
+) : AbstractContainerScope(testScope) {
 
    suspend fun String.config(
       enabled: Boolean? = null,
@@ -62,4 +62,22 @@ class WordSpecShouldContainerScope(
    suspend infix operator fun String.invoke(test: suspend WordSpecTerminalScope.() -> Unit) {
       registerTest(TestNameBuilder.builder(this).build(), false, null) { WordSpecTerminalScope(this).test() }
    }
+
+   @Deprecated(
+      WithDataRegistrar.NO_NESTED_WITH_DATA,
+      level = DeprecationLevel.ERROR
+   )
+   override fun registerWithDataTest(
+      name: String,
+      test: suspend TestScope.() -> Unit
+   ): Nothing = error(WithDataRegistrar.NO_NESTED_WITH_DATA)
+
+   @Deprecated(
+      WithDataRegistrar.NO_NESTED_WITH_DATA,
+      level = DeprecationLevel.ERROR
+   )
+   override suspend fun registerSuspendWithDataTest(
+      name: String,
+      test: suspend TestScope.() -> Unit
+   ): Nothing = error(WithDataRegistrar.NO_NESTED_WITH_DATA)
 }

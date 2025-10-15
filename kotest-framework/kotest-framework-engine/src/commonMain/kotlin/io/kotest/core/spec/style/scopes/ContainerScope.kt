@@ -25,6 +25,7 @@ import io.kotest.core.test.TestCase
 import io.kotest.core.test.TestScope
 import io.kotest.core.test.TestType
 import io.kotest.core.test.config.TestConfig
+import io.kotest.datatest.WithDataRegistrar
 import io.kotest.engine.config.projectConfigResolver
 import io.kotest.engine.test.TestResult
 import kotlin.coroutines.CoroutineContext
@@ -231,7 +232,7 @@ interface ContainerScope : TestScope {
 @KotestInternal
 abstract class AbstractContainerScope(
    private val testScope: TestScope
-) : ContainerScope {
+) : ContainerScope, WithDataRegistrar() {
 
    private var registered = false
    override val testCase: TestCase = testScope.testCase

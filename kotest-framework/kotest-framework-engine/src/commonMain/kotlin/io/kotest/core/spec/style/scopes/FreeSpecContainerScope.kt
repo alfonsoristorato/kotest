@@ -7,10 +7,11 @@ import io.kotest.core.test.EnabledIf
 import io.kotest.core.test.TestCaseSeverityLevel
 import io.kotest.core.test.TestScope
 import io.kotest.core.test.config.TestConfig
-import io.kotest.datatest.WithDataContainerRegistrar
+import io.kotest.datatest.WithDataRegistrar
 import kotlin.time.Duration
 
-class FreeSpecContainerScope(val testScope: TestScope) : AbstractContainerScope(testScope), WithDataContainerRegistrar<FreeSpecContainerScope> {
+class FreeSpecContainerScope(val testScope: TestScope) :
+   AbstractContainerScope(testScope) {
 
    /**
     * Creates a new container scope inside this spec.
@@ -130,9 +131,18 @@ class FreeSpecContainerScope(val testScope: TestScope) : AbstractContainerScope(
       return FreeSpecContextConfigBuilder(this, config)
    }
 
-   override suspend fun registerWithDataTest(
+   @Deprecated(
+      WithDataRegistrar.NO_BLOCKING_WITH_DATA,
+      level = DeprecationLevel.ERROR
+   )
+   override fun registerWithDataTest(
       name: String,
-      test: suspend FreeSpecContainerScope.() -> Unit
+      test: suspend TestScope.() -> Unit
+   ): Nothing = error(WithDataRegistrar.NO_BLOCKING_WITH_DATA)
+
+   override suspend fun registerSuspendWithDataTest(
+      name: String,
+      test: suspend TestScope.() -> Unit
    ) {
       name.minus { test() }
    }
